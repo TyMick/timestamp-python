@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- prettier-ignore -->
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="shortcut icon" href="https://cdn.glitch.com/e1c8387f-9c1d-4683-84b5-32c40c510abd%2Ffavicon.ico?v=1579979902340" type="image/x-icon" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/default.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+
+    <title>Python timestamp microservice – Ty Mick</title>
+  </head>
+
+  <body style="background-color: #dee2e6;">
+    <div class="container-md my-5">
+      <h1 class="mb-4">Python timestamp microservice</h1>
+
+      <!-- API test front end -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">Test this API:</h5>
+
+          <form id="apiTest" class="mb-4">
+            <div class="form-group">
+              <label class="sr-only" for="apiInput">API input</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    /api/timestamp/
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  id="apiInput"
+                  class="form-control"
+                  aria-describedby="inputHelp"
+                  style="max-width: 15.5em;"
+                />
+              </div>
+              <small id="inputHelp" class="form-text text-muted">
+                Note that the input must be either blank, a valid ISO-8601 date
+                string, or a Unix timestamp in milliseconds to get a meaningful
+                result.
+              </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">GET</button>
+          </form>
+
+          <h5>API output:</h5>
+
+          <div class="card">
+            <pre id="apiOutput" class="hljs bg-white mb-0">&#8203;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explanation -->
+      <p class="lead font-italic">
+        View the source on
+        <a href="https://github.com/tywmick/timestamp-python">GitHub</a>
+        or <a href="https://glitch.com/edit/#!/ty-timestamp-python">Glitch</a>.
+      </p>
+
+      <p>
+        This is a Python/<a href="https://flask.palletsprojects.com/en/1.1.x/"
+          >Flask</a
+        >
+        port of my
+        <a href="https://ty-timestamp.glitch.me"
+          >Node.js timestamp microservice project</a
+        >, which was originally built to fulfill the following user stories:
+      </p>
+
+      <ol>
+        <li>
+          The API endpoint is
+          <code>GET [project_url]/api/timestamp/:date_string?</code>
+        </li>
+        <li>
+          A date string is valid if can be successfully parsed by
+          <code>new Date(date_string)</code>.
+          <ul class="pl-3">
+            <li>
+              Note that the unix timestamp needs to be an
+              <strong>integer</strong> (not a string) specifying
+              <strong>milliseconds</strong>.
+            </li>
+            <li>
+              In our test we will use date strings compliant with ISO-8601 (e.g.
+              <code>"2016-11-20"</code>) because this will ensure an UTC
+              timestamp.
+            </li>
+          </ul>
+        </li>
+        <li>
+          If the date string is <strong>empty</strong> it should be equivalent
+          to trigger <code>new Date()</code>, i.e. the service uses the current
+          timestamp.
+        </li>
+        <li>
+          If the date string is <strong>valid</strong> the api returns a JSON
+          having the structure
+          <code
+            >{"unix": &lt;date.getTime()&gt;, "utc" :
+            &lt;date.toUTCString()&gt;}</code
+          >
+          e.g.
+          <code
+            >{"unix": 1479663089000, "utc": "Sun, 20 Nov 2016 17:31:29
+            GMT"}</code
+          >
+        </li>
+        <li>
+          If the date string is <strong>invalid</strong> the api returns
+          <code>{"error": "Invalid Date"}</code>.
+        </li>
+      </ol>
+    </div>
+
+    <!-- Glitch button -->
+    <div
+      class="glitchButton"
+      style="position:absolute;top:20px;right:20px;"
+    ></div>
+    <script src="https://button.glitch.me/button.js"></script>
+
+    <!-- API test script -->
+    <script>
+      $(function() {
+        $("#apiTest").submit(function() {
+          event.preventDefault();
+          $("button").attr("disabled", true);
+          $("button", this).html(
+            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="sr-only">Uploading...</span>'
+          );
+          $.ajax({
+            url: "/api/timestamp/" + $("#apiInput").val(),
+            type: "get",
+            success: function(result) {
+              $("#apiOutput").text(JSON.stringify(result, null, 2));
+              hljs.highlightBlock(document.getElementById("apiOutput"));
+              $("#apiTest button").html("GET");
+              $("button").removeAttr("disabled");
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
