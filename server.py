@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timezone
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, render_template, jsonify
 
 app = Flask(__name__, static_folder="public", template_folder="views")
 
